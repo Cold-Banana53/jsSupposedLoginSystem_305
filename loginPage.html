@@ -131,6 +131,7 @@
                     const existingUser = event.target.result;
                     if (existingUser) {
                         errorMessage.textContent = "Username already exists. Please choose a different one.";
+                        localStorage.setItem("username", usernameNew);
                     } else {
                         // Username is available, add the new user
                         const addUserTransaction = db.transaction(["users"], "readwrite");
@@ -141,7 +142,10 @@
                         addUserRequest.onsuccess = function(event) {
                             console.log("New user added successfully!");
                             // Redirect to login page
-                            location.href = "./loginPage.html";
+                            localStorage.setItem("username", usernameNew);
+                            setTimeout(function() {
+                                location.href = "./loginPage.html";
+                            }, 100);
                         };
 
                         addUserRequest.onerror = function(event) {
@@ -158,7 +162,6 @@
 
         document.getElementById("loginForm").addEventListener("submit", function(event) {
                 event.preventDefault();
-                
                 const usernameNew = document.getElementById("username").value;
                 const passwordNew = document.getElementById("password").value;
                 const errorMessage = document.getElementById('error-message');
@@ -184,9 +187,12 @@
                         const user = event.target.result;
                         if (user && user.password === passwordNew) {
                             errorMessage.textContent = "Login successful!";
+                            localStorage.setItem("username", usernameNew);
                             // Redirect to main site after successful login
                             setTimeout(function() {
-                                location.href = "./mainSite.html";
+                                // Assuming this code is executed after successful login
+                                window.location.href = "mainSite.html?username=" + encodeURIComponent(usernameNew);
+
                             }, 100); // Add a slight delay to ensure transaction completion
                         } else {
                             errorMessage.textContent = "Invalid username or password. Have you registered yet?";
